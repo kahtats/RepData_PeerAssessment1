@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 Seah Kah Tat
 
 
@@ -11,7 +6,8 @@ Seah Kah Tat
 
 First, the data for this assignment can be downloaded and extracted from the .zip file to the working directory using the following code:
 
-```{r eval=FALSE, echo=TRUE}
+
+```r
 # download zip file
 fileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
 dest <- paste(getwd(), "/repdata-data-activity.zip", sep = "")
@@ -24,7 +20,8 @@ if(!file.exists(filename)) unzip(dest)
 
 The data can then be read and preprocessed with the following code:
 
-```{r echo=TRUE}
+
+```r
 # create a data frame containing total number of steps for each day
 data <- read.csv("activity.csv")
 daily_steps <- aggregate(data$steps, list(data$date), function(x) sum(x,na.rm = TRUE))
@@ -40,47 +37,74 @@ colnames(int_steps) <- c("interval", "steps")
 
 The following is a histrogram of the total number of steps taken for each day:
 
-```{r echo=TRUE}
+
+```r
 barplot(daily_steps$steps, names.arg = daily_steps$date, space = 0, xlab = "Date", ylab = "Number of Steps")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-3-1.png) 
+
 Mean total number of steps:
 
-```{r echo=TRUE}
+
+```r
 mean(daily_steps$steps)
+```
+
+```
+## [1] 9354.23
 ```
 
 Median total number of steps:
 
-```{r echo=TRUE}
+
+```r
 median(daily_steps$steps)
+```
+
+```
+## [1] 10395
 ```
 
 ## What is the average daily activity pattern?
 
 The following is a time series plot of the average number of steps taken across all days at each 5-minute interval:
 
-```{r echo=TRUE}
+
+```r
 plot(int_steps$interval, int_steps$steps, type = "l", xlab = "Interval", ylab = "Number of Steps")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png) 
+
 Interval that contains the maximum number of steps:
-```{r echo=TRUE}
+
+```r
 int_steps[which.max(int_steps$steps),"interval"]
+```
+
+```
+## [1] 835
 ```
 
 ## Imputing missing values
 
 Total number of missing values in the dataset:
 
-```{r echo=TRUE}
+
+```r
 completed <- complete.cases(data)
 sum(!completed)
 ```
 
+```
+## [1] 2304
+```
+
 My general strategy for filling the missing values is to replace them with the mean number of steps at the respective 5-minute interval. This can be executed with the following code to generate a new dataset with the missing values filled up:
 
-```{r echo=TRUE}
+
+```r
 filled_data <- data
 for(i in 1:nrow(filled_data)) 
     if(is.na(filled_data[i,"steps"]))
@@ -94,20 +118,33 @@ new_daily_steps$date <- as.Date(new_daily_steps$date_unformat, "%Y-%m-%d")
 
 The corresponding histogram for this new dataset is shown below:
 
-```{r echo=TRUE}
+
+```r
 barplot(new_daily_steps$steps, names.arg = new_daily_steps$date, space = 0, xlab = "Date", ylab = "Number of Steps")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-10-1.png) 
+
 In this case, the mean total number of steps is
 
-```{r echo=TRUE}
+
+```r
 mean(new_daily_steps$steps)
+```
+
+```
+## [1] 37.3826
 ```
 
 which is more than the mean calculated from the origina dataset. The median total number of steps is now
 
-```{r echo=TRUE}
+
+```r
 median(new_daily_steps$steps)
+```
+
+```
+## [1] 37.3826
 ```
 
 which is higher than that from the previous dataset. This shows that imputing missing data results in a higher estimate on the total daily number of steps.
@@ -116,7 +153,8 @@ which is higher than that from the previous dataset. This shows that imputing mi
 
 To plot the activity pattern for weekdays and weekends respectively, first preprocess the dataset with the filled-in missing values as follow:
 
-```{r warning=FALSE, echo=TRUE}
+
+```r
 filled_data$day <- weekdays(as.Date(filled_data$date, "%Y-%m-%d"))
 filled_data$day <- factor(as.character(filled_data$day), labels = c("Weekday","Weekday","Weekend","Weekend","Weekday","Weekday","Weekday"))
 
@@ -136,9 +174,12 @@ plotdata$day <- factor(plotdata$day, labels = c("Weekday", "Weekend"))
 
 Then with the processed data frame, plot the data using the lattice plotting system as follow: 
 
-```{r echo=TRUE}
+
+```r
 library(lattice)
 xyplot(steps~interval | factor(day), data = plotdata, type = "l", layout = matrix(c(1, 2), 2, 1, byrow = TRUE), as.table = TRUE, xlab = "Interval", ylab = "Number of Steps")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png) 
 
 The resulting plot serves as a basis for comparing the activity patterns between weekdays and weekends.
