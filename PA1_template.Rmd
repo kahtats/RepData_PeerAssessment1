@@ -87,7 +87,7 @@ for(i in 1:nrow(filled_data))
         filled_data[i,"steps"] <- int_steps[which(int_steps$interval == filled_data[i, "interval"]), "steps"]
 
 # create a data frame containing total number of steps for each day from new dataset
-new_daily_steps <- aggregate(filled_data$steps, list(filled_data$date), mean)
+new_daily_steps <- aggregate(filled_data$steps, list(filled_data$date), sum)
 colnames(new_daily_steps) <- c("date_unformat", "steps")
 new_daily_steps$date <- as.Date(new_daily_steps$date_unformat, "%Y-%m-%d")
 ```
